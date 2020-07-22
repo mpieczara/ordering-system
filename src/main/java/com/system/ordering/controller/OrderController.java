@@ -2,9 +2,9 @@ package com.system.ordering.controller;
 
 import com.system.ordering.assembler.OrderModelAssembler;
 import com.system.ordering.dto.OrderDto;
+import com.system.ordering.exceptions.OrderNotFoundException;
 import com.system.ordering.model.Order;
 import com.system.ordering.service.OrderService;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -50,13 +50,14 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public EntityModel<Order> getOrder(@PathVariable Long id) {
-        Order order = orderService.findById(id);
+        Order order = orderService.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
 
         return orderModelAssembler.toModel(order);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<Order>> updateOrder(@RequestBody Order newOrder, @PathVariable Long id) {
+    public ResponseEntity<EntityModel<Order>> updateOrder(@RequestBody OrderDto newOrder, @PathVariable Long id) {
 
         Order updatedOrder = orderService.update(id, newOrder);
 

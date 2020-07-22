@@ -24,8 +24,7 @@ public class Order {
 
     }
 
-    public Order(Long id, String name, String customer, LocalDate date) {
-        this.id = id;
+    public Order(String name, String customer, LocalDate date) {
         this.name = name;
         this.customer = customer;
         this.date = date;

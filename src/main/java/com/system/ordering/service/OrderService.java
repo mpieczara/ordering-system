@@ -2,13 +2,13 @@ package com.system.ordering.service;
 
 import com.system.ordering.dto.OrderDto;
 import com.system.ordering.model.Order;
-import com.system.ordering.exceptions.OrderNotFoundException;
 import com.system.ordering.repository.OrderRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -24,9 +24,8 @@ public class OrderService {
     }
 
     @Cacheable(value = "orders", key = "#id")
-    public Order findById(Long id) {
-        return orderRepository.findById(id)
-                .orElseThrow(() -> new OrderNotFoundException(id));
+    public Optional<Order> findById(Long id) {
+        return orderRepository.findById(id);
     }
 
     public Order save(OrderDto orderDto) {
@@ -35,7 +34,9 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public Order update(Long id, Order newOrder) {
+    public Order update(Long id, OrderDto newOrderDto) {
+        ModelMapper modelMapper = new ModelMapper();
+        Order newOrder = modelMapper.map(newOrderDto, Order.class);
         return orderRepository.findById(id)
                 .map(order -> {
                     order.setName(newOrder.getName());
